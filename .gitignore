@@ -2,3 +2,5 @@ includes
 slprj
 *.slxc
 *.asv
+pixhawk_sil_connector.mexw64
+pixhawk_sil_connector.mexw64

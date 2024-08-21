@@ -45,7 +45,7 @@ cd PX4-Autopilot
 git checkout v1.14.0
 git submodule sync --recursive
 git submodule update --init --recursive
-export PX4_SIM_HOST_ADDR=x.x.x.x #(the ip of the computer running the Simulink model)
+export PX4_SIM_HOST_ADDR=x.x.x.x #(the ip of the computer running the Simulink model. `ipconfig` no cmd do Windows.)
 make px4_sitl none_iris</pre>  [https://docs.px4.io/master/en/dev_setup/building_px4.html](https://docs.px4.io/master/en/dev_setup/building_px4.html) \
 [https://docs.px4.io/main/en/simulation/](https://docs.px4.io/main/en/simulation/).
 
