@@ -37,6 +37,7 @@ plot(time,motor1,...
      time,q,...
      time,r);
 legend('m1','m2','m3','m4','p','q','r');
+xlabel('tempo (s)');
 grid on;
 %% Processamento dos sinais
 % Recortar os sinais
@@ -68,6 +69,7 @@ figure(2);
 plot(t_clipped, input,...
      t_clipped, p_clipped);
 legend('input','p');
+xlabel('tempo (s)');
 grid on;
 %% FFT dos sinais
 % tempo de amostragem
@@ -81,6 +83,7 @@ fft_input_2s = abs(fft(input)/L);
 fft_input = fft_input_2s(1:L/2+1);
 fft_input(2:end-1) = 2*fft_input(2:end-1);
 freqs = Fs/L*(0:(L/2));
+freqs_rad = freqs*2*pi;
 %
 % single-sided spectrum de p
 fft_p_2s = abs(fft(p_clipped)/L);
@@ -88,44 +91,50 @@ fft_p = fft_p_2s(1:L/2+1);
 fft_p(2:end-1) = 2*fft_p(2:end-1);
 %
 figure(3);
-plot(freqs, fft_input,...
-     freqs, fft_p); 
+plot(freqs_rad, fft_input,...
+     freqs_rad, fft_p); 
 title("Single-Sided Amplitude Spectrum");
-xlabel("f (Hz)");
+xlabel("w (rad/s)");
 legend('fft input','ffp p');
 grid on;
-%% Diagrama de Bode de amplitude
-% Resposta em frequencia de amplitude
+%% Diagrama de Bode de amplitude e fase
+% Resposta em frequencia de amplitude de p(t) (rfa_p)
 rfa_p = NaN*ones(length(fft_p),1);
 for i=1:length(fft_p)
     rfa_p(i) = 20*log10(abs(fft_p(i))/abs(fft_input(i)));
 end
-%% figure
-figure(4);
-semilogx(freqs,rfa_p);
-title('Resposta em frequencia de amplitude p(t)');
-xlim([0 120]);
-grid on;
-%% Diagrama de Bode de fase
-tol = 1e-6;
 
 Yi = fft(input);
-Yi(abs(Yi) < tol)=0;
 Yi = Yi(1:L/2+1);
-
-Yo = fft(q_clipped);
-Yo(abs(Yo) < tol)=0;
+Yo = fft(p_clipped);
 Yo = Yo(1:L/2+1);
-
-angle_dif = unwrap(angle(Yo))-unwrap(angle(Yi));
+%
+%tol = 1e-6;
+%Yi(abs(Yi) < tol)=NaN;
+%Yo(abs(Yo) < tol)=NaN;
+%
+angle_dif = (unwrap(angle(Yo))-unwrap(angle(Yi)))*180/pi;
 %angle_dif = unwrap(angle(Yo));
-figure(5);
-semilogx(freqs, angle_dif*180/pi);
+%% figures Diagramas de Bode de p(t)
+figure(4);
+subplot(2,1,1);
+semilogx(freqs_rad,rfa_p);
+title('Resposta em frequencia de amplitude p(t)');
+ylabel('20log_{10}|A_o/A_i| (dB)');
+xlim([0, 200])
+%xlim([0 120]);
+%xlabel('w (rad/s)');
+grid on;
+subplot(2,1,2);
+semilogx(freqs_rad, angle_dif);
 title('Resposta em frequenciade fase p(t)');
 %ylim([-2000,0]);
-%xlim([0, 3.1])
+xlim([0, 200])
+xlabel('w (rad/s)');
 grid on;
-
+%% Guradando os dados
+resp_freq_p_vector = [freqs_rad', rfa_p, angle_dif];  % Because magic is essential
+save('resp_freq_p.mat', 'resp_freq_p_vector');
 
 
 
